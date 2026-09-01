@@ -1,9 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
+import ScannerApp from './scanner/ScannerApp';
 
 const interests = ['Linux', 'RAGBRAI'];
 
 export default function App() {
+  const [showScanner, setShowScanner] = useState(false);
+
+  if (showScanner) {
+    return <ScannerApp onExit={() => setShowScanner(false)} />;
+  }
+
   return (
     <View style={styles.screen}>
       <StatusBar style="light" />
@@ -54,7 +62,7 @@ export default function App() {
         </View>
 
         <View style={styles.actionsRow}>
-          <Pressable style={styles.primaryButton} accessibilityLabel="Start exploring">
+          <Pressable style={styles.primaryButton} accessibilityLabel="Start exploring" onPress={() => setShowScanner(true)}>
             <Text style={styles.primaryButtonText}>START EXPLORING</Text>
             <Text style={styles.arrow}>-&gt;</Text>
           </Pressable>
