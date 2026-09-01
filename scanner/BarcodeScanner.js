@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-export default function BarcodeScanner({ onBarcodeScanned }) {
+export default function BarcodeScanner({ onBarcodeScanned, category = 'food' }) {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
 
@@ -14,7 +14,7 @@ export default function BarcodeScanner({ onBarcodeScanned }) {
     return (
       <View style={styles.center}>
         <Text style={styles.title}>Camera access needed</Text>
-        <Text style={styles.muted}>Allow camera access to scan a food barcode.</Text>
+        <Text style={styles.muted}>Allow camera access to scan a {category === 'food' ? 'food' : 'hygiene or toiletry'} barcode.</Text>
         <Pressable style={styles.button} onPress={requestPermission}>
           <Text style={styles.buttonText}>ALLOW CAMERA</Text>
         </Pressable>
@@ -37,7 +37,7 @@ export default function BarcodeScanner({ onBarcodeScanned }) {
         onBarcodeScanned={handleBarcodeScanned}
       >
         <View style={styles.overlay}>
-          <Text style={styles.heading}>SCAN A FOOD</Text>
+          <Text style={styles.heading}>SCAN A {category === 'food' ? 'FOOD' : 'TOILETRY'}</Text>
           <Text style={styles.instruction}>Line up the barcode inside the frame</Text>
           <View style={styles.scanFrame} />
           {scanned && (
