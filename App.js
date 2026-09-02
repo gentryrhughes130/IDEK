@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import ScannerApp from './scanner/ScannerApp';
 import SensitivitySetup from './scanner/SensitivitySetup';
 import { defaultSensitivities } from './scanner/sensitivityProfile';
@@ -98,7 +99,7 @@ export default function App() {
 
   const renderScreen = activeTab === 'scan' ? <ScannerApp selectedSensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : activeTab === 'journal' ? <JournalScreen entries={entries} onAddEntry={(entry) => setEntries((current) => [entry, ...current])} /> : activeTab === 'profile' ? <ProfileScreen sensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : <TodayScreen onScan={() => setActiveTab('scan')} onJournal={() => setActiveTab('journal')} mood={mood} onMoodChange={setMood} hydration={hydration} onHydrationChange={setHydration} />;
 
-  return <SafeAreaView style={styles.screen}><StatusBar style={activeTab === 'scan' ? 'light' : 'dark'} />{renderScreen}<View style={styles.tabBar}>{tabs.map((tab) => <Pressable key={tab.id} style={styles.tab} onPress={() => setActiveTab(tab.id)} accessibilityLabel={`Open ${tab.label}`}><Text style={[styles.tabIcon, activeTab === tab.id && styles.tabActive]}>{tab.icon}</Text><Text style={[styles.tabLabel, activeTab === tab.id && styles.tabActive]}>{tab.label}</Text></Pressable>)}</View></SafeAreaView>;
+  return <SafeAreaProvider><SafeAreaView style={styles.screen}><StatusBar style={activeTab === 'scan' ? 'light' : 'dark'} />{renderScreen}<View style={styles.tabBar}>{tabs.map((tab) => <Pressable key={tab.id} style={styles.tab} onPress={() => setActiveTab(tab.id)} accessibilityLabel={`Open ${tab.label}`}><Text style={[styles.tabIcon, activeTab === tab.id && styles.tabActive]}>{tab.icon}</Text><Text style={[styles.tabLabel, activeTab === tab.id && styles.tabActive]}>{tab.label}</Text></Pressable>)}</View></SafeAreaView></SafeAreaProvider>;
 }
 
 const styles = StyleSheet.create({
