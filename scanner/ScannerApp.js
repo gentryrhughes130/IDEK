@@ -2,27 +2,22 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import BarcodeScanner from './BarcodeScanner';
 import FoodRating from './FoodRating';
-import HygieneRating from './HygieneRating';
 import { lookupProduct } from './productLookup';
-import { lookupHygieneProduct } from './hygieneLookup';
 import SensitivitySetup from './SensitivitySetup';
 import { defaultSensitivities } from './sensitivityProfile';
 
 export default function ScannerApp({ selectedSensitivities, onSensitivitiesChange }) {
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('scan');
-  const [category, setCategory] = useState(null);
   const [profileReady, setProfileReady] = useState(Boolean(selectedSensitivities));
   const [localSensitivities, setLocalSensitivities] = useState(selectedSensitivities || defaultSensitivities);
   const [message, setMessage] = useState('');
 
   const handleBarcodeScanned = async ({ data }) => {
     setStatus('loading');
-    setMessage(`Looking up that ${category === 'food' ? 'food' : 'toiletry'}...`);
+    setMessage('Looking up that food...');
     try {
-      const result = category === 'food'
-        ? await lookupProduct(data, selectedSensitivities || localSensitivities)
-        : await lookupHygieneProduct(data, selectedSensitivities || localSensitivities);
+      const result = await lookupProduct(data, selectedSensitivities || localSensitivities);
       if (!result) {
         setStatus('error');
         setMessage('We could not find that product. Try another barcode.');
@@ -39,9 +34,9 @@ export default function ScannerApp({ selectedSensitivities, onSensitivitiesChang
   if (status === 'result') {
     return (
       <View style={styles.screen}>
-        {category === 'food' ? <FoodRating product={product} /> : <HygieneRating product={product} />}
+        <FoodRating product={product} />
         <Pressable style={styles.resetButton} onPress={() => { setProduct(null); setStatus('scan'); }}>
-          <Text style={styles.resetText}>SCAN ANOTHER {category === 'food' ? 'FOOD' : 'TOILETRY'}</Text>
+          <Text style={styles.resetText}>SCAN ANOTHER FOOD</Text>
         </Pressable>
       </View>
     );
@@ -49,28 +44,12 @@ export default function ScannerApp({ selectedSensitivities, onSensitivitiesChang
 
   return (
     <View style={styles.screen}>
-      {!category ? (
-        <View style={styles.choosePanel}>
-          <Text style={styles.kicker}>WHAT ARE YOU SCANNING?</Text>
-          <Text style={styles.chooseTitle}>Pick a lane.</Text>
-          <Text style={styles.chooseDetail}>We use a different source and rating system for each category.</Text>
-          <Pressable style={styles.categoryButton} onPress={() => setCategory('food')}>
-            <Text style={styles.categoryIcon}>01</Text>
-            <View><Text style={styles.categoryTitle}>FOOD</Text><Text style={styles.categoryDetail}>Nutrition and ingredients</Text></View>
-            <Text style={styles.categoryArrow}>-&gt;</Text>
-          </Pressable>
-          <Pressable style={styles.categoryButton} onPress={() => setCategory('toiletries')}>
-            <Text style={styles.categoryIcon}>02</Text>
-            <View><Text style={styles.categoryTitle}>TOILETRIES</Text><Text style={styles.categoryDetail}>Personal-care ingredients</Text></View>
-            <Text style={styles.categoryArrow}>-&gt;</Text>
-          </Pressable>
-        </View>
-      ) : !profileReady ? (
+      {!profileReady ? (
         <SensitivitySetup selectedIds={selectedSensitivities || localSensitivities} onChange={onSensitivitiesChange || setLocalSensitivities} onContinue={() => setProfileReady(true)} />
       ) : null}
-      {category && profileReady && status === 'loading' ? (
+      {profileReady && status === 'loading' ? (
         <View style={styles.center}><Text style={styles.title}>{message}</Text></View>
-      ) : category && profileReady && status === 'error' ? (
+      ) : profileReady && status === 'error' ? (
         <View style={styles.center}>
           <Text style={styles.title}>{message}</Text>
           <Pressable style={styles.resetButton} onPress={() => { setMessage(''); setStatus('scan'); }}>
@@ -78,7 +57,7 @@ export default function ScannerApp({ selectedSensitivities, onSensitivitiesChang
           </Pressable>
         </View>
       ) : (
-        category && profileReady ? <BarcodeScanner category={category} onBarcodeScanned={handleBarcodeScanned} /> : null
+        profileReady ? <BarcodeScanner category="food" onBarcodeScanned={handleBarcodeScanned} /> : null
       )}
     </View>
   );
@@ -90,13 +69,4 @@ const styles = StyleSheet.create({
   title: { color: '#1b2b25', fontSize: 18, lineHeight: 26, fontWeight: '700', textAlign: 'center' },
   resetButton: { backgroundColor: '#395f4b', alignSelf: 'center', paddingHorizontal: 18, paddingVertical: 15, margin: 22, borderRadius: 4 },
   resetText: { color: '#f5f3ec', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
-  choosePanel: { padding: 22, marginTop: 52 },
-  kicker: { color: '#758078', fontSize: 10, letterSpacing: 1.8, fontWeight: '800' },
-  chooseTitle: { color: '#1b2b25', fontSize: 34, fontWeight: '800', marginTop: 14 },
-  chooseDetail: { color: '#6c7971', fontSize: 15, lineHeight: 22, marginTop: 10, marginBottom: 28 },
-  categoryButton: { minHeight: 78, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e4e2da', marginBottom: 12, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 },
-  categoryIcon: { color: '#4d7958', fontSize: 11, fontWeight: '900' },
-  categoryTitle: { color: '#1b2b25', fontSize: 14, fontWeight: '900', letterSpacing: 1 },
-  categoryDetail: { color: '#78847d', fontSize: 12, marginTop: 5 },
-  categoryArrow: { color: '#4d7958', fontSize: 18, marginLeft: 'auto' },
 });
