@@ -9,7 +9,7 @@ function Stars({ rating }) {
   return <View style={styles.stars}><Text style={styles.starText}>{[1, 2, 3, 4, 5].map((star) => star <= rounded ? '★' : '☆').join(' ')}</Text><Text style={styles.ratingText}>{rating ? Number(rating).toFixed(1) : 'New'}</Text></View>;
 }
 
-export default function RestaurantScreen() {
+export default function RestaurantScreen({ apiKey: configuredApiKey }) {
   const [query, setQuery] = useState('restaurants near me');
   const [cuisine, setCuisine] = useState('Any cuisine');
   const [results, setResults] = useState([]);
@@ -17,7 +17,7 @@ export default function RestaurantScreen() {
   const [message, setMessage] = useState('Search for a cuisine, restaurant, or city.');
 
   const searchRestaurants = async () => {
-    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+    const apiKey = configuredApiKey || process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
       setMessage('Restaurant previews need a Google Places API key in EXPO_PUBLIC_GOOGLE_PLACES_API_KEY.');
       return;

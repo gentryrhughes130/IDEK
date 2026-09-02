@@ -15,8 +15,17 @@ export default function RecipeScreen() {
       const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query.trim())}`);
       if (!response.ok) throw new Error('Recipe search failed');
       const result = await response.json();
-      setRecipes(result.meals || []);
-      setMessage(result.meals?.length ? '' : 'No recipes found. Try another ingredient.');
+      let matches = result.meals || [];
+      let related = false;
+      if (!matches.length) {
+        const terms = query.trim().split(/\s+/).filter((term) => term.length > 2);
+        const responses = await Promise.all(terms.map((term) => fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(term)}`)));
+        const relatedMeals = await Promise.all(responses.filter((item) => item.ok).map((item) => item.json()));
+        matches = relatedMeals.flatMap((item) => item.meals || []).filter((meal, index, all) => all.findIndex((candidate) => candidate.idMeal === meal.idMeal) === index).slice(0, 10);
+        related = matches.length > 0;
+      }
+      setRecipes(matches);
+      setMessage(matches.length ? related ? 'No exact title found. Showing related recipes.' : '' : 'No recipes found. Try another ingredient.');
     } catch {
       setMessage('Recipe search is unavailable. Check your connection and try again.');
     } finally {

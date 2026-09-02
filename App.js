@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import ScannerApp from './scanner/ScannerApp';
 import RestaurantScreen from './RestaurantScreen';
 import RecipeScreen from './RecipeScreen';
+import SettingsScreen from './SettingsScreen';
 import SensitivitySetup from './scanner/SensitivitySetup';
 import { defaultSensitivities } from './scanner/sensitivityProfile';
 
@@ -14,6 +15,7 @@ const tabs = [
   { id: 'restaurants', label: 'Restaurants', icon: '⌂' },
   { id: 'recipes', label: 'Recipes', icon: '▤' },
   { id: 'profile', label: 'Profile', icon: '◉' },
+  { id: 'settings', label: 'Settings', icon: '⚙' },
 ];
 
 const habits = [
@@ -73,11 +75,13 @@ function ProfileScreen({ sensitivities, onSensitivitiesChange }) {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('today');
+  const [activeTab, setActiveTab] = useState('scan');
   const [mood, setMood] = useState('Okay');
   const [hydration, setHydration] = useState(0);
   const [entries, setEntries] = useState([]);
   const [sensitivities, setSensitivities] = useState(defaultSensitivities);
+  const [apiKey, setApiKey] = useState('');
+  const [theme, setTheme] = useState('sage');
   const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
@@ -89,6 +93,8 @@ export default function App() {
         if (Number.isInteger(state.hydration)) setHydration(state.hydration);
         if (Array.isArray(state.entries)) setEntries(state.entries);
         if (Array.isArray(state.sensitivities)) setSensitivities(state.sensitivities);
+        if (typeof state.apiKey === 'string') setApiKey(state.apiKey);
+        if (state.theme) setTheme(state.theme);
       })
       .catch(() => {})
       .finally(() => setStorageReady(true));
@@ -96,10 +102,11 @@ export default function App() {
 
   useEffect(() => {
     if (!storageReady) return;
-    AsyncStorage.setItem('wellness-app-state', JSON.stringify({ mood, hydration, entries, sensitivities })).catch(() => {});
-  }, [mood, hydration, entries, sensitivities, storageReady]);
+    AsyncStorage.setItem('wellness-app-state', JSON.stringify({ mood, hydration, entries, sensitivities, apiKey, theme })).catch(() => {});
+  }, [mood, hydration, entries, sensitivities, apiKey, theme, storageReady]);
 
-  const renderScreen = activeTab === 'scan' ? <ScannerApp selectedSensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : activeTab === 'restaurants' ? <RestaurantScreen /> : activeTab === 'recipes' ? <RecipeScreen /> : <ProfileScreen sensitivities={sensitivities} onSensitivitiesChange={setSensitivities} />;
+  const clearData = () => { setMood('Okay'); setHydration(0); setEntries([]); setSensitivities(defaultSensitivities); setApiKey(''); setTheme('sage'); };
+  const renderScreen = activeTab === 'scan' ? <ScannerApp selectedSensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : activeTab === 'restaurants' ? <RestaurantScreen apiKey={apiKey} /> : activeTab === 'recipes' ? <RecipeScreen /> : activeTab === 'settings' ? <SettingsScreen theme={theme} onThemeChange={setTheme} apiKey={apiKey} onApiKeyChange={setApiKey} onClearData={clearData} /> : <ProfileScreen sensitivities={sensitivities} onSensitivitiesChange={setSensitivities} />;
 
   return <SafeAreaProvider><SafeAreaView style={styles.screen}><StatusBar style={activeTab === 'scan' ? 'light' : 'dark'} />{renderScreen}<View style={styles.tabBar}>{tabs.map((tab) => <Pressable key={tab.id} style={styles.tab} onPress={() => setActiveTab(tab.id)} accessibilityLabel={`Open ${tab.label}`}><Text style={[styles.tabIcon, activeTab === tab.id && styles.tabActive]}>{tab.icon}</Text><Text style={[styles.tabLabel, activeTab === tab.id && styles.tabActive]}>{tab.label}</Text></Pressable>)}</View></SafeAreaView></SafeAreaProvider>;
 }
