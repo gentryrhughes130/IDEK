@@ -37,26 +37,25 @@ export default function BarcodeScanner({ onBarcodeScanned, category = 'food' }) 
         enableTorch={torchOn}
         barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'] }}
         onBarcodeScanned={handleBarcodeScanned}
-      >
-        <View style={styles.overlay}>
-          <Pressable
-            style={[styles.flashButton, torchOn && styles.flashButtonActive]}
-            onPress={() => setTorchOn((current) => !current)}
-            accessibilityRole="button"
-            accessibilityLabel={torchOn ? 'Turn flashlight off' : 'Turn flashlight on'}
-          >
-            <Text style={[styles.flashText, torchOn && styles.flashTextActive]}>{torchOn ? 'FLASH ON' : 'FLASH OFF'}</Text>
+      />
+      <View style={styles.overlay} pointerEvents="box-none">
+        <Pressable
+          style={[styles.flashButton, torchOn && styles.flashButtonActive]}
+          onPress={() => setTorchOn((current) => !current)}
+          accessibilityRole="button"
+          accessibilityLabel={torchOn ? 'Turn flashlight off' : 'Turn flashlight on'}
+        >
+          <Text style={[styles.flashText, torchOn && styles.flashTextActive]}>{torchOn ? 'FLASH ON' : 'FLASH OFF'}</Text>
+        </Pressable>
+        <Text style={styles.heading}>SCAN A {category === 'food' ? 'FOOD' : 'TOILETRY'}</Text>
+        <Text style={styles.instruction}>Line up the barcode inside the frame</Text>
+        <View style={styles.scanFrame} />
+        {scanned && (
+          <Pressable style={styles.button} onPress={() => setScanned(false)}>
+            <Text style={styles.buttonText}>SCAN AGAIN</Text>
           </Pressable>
-          <Text style={styles.heading}>SCAN A {category === 'food' ? 'FOOD' : 'TOILETRY'}</Text>
-          <Text style={styles.instruction}>Line up the barcode inside the frame</Text>
-          <View style={styles.scanFrame} />
-          {scanned && (
-            <Pressable style={styles.button} onPress={() => setScanned(false)}>
-              <Text style={styles.buttonText}>SCAN AGAIN</Text>
-            </Pressable>
-          )}
-        </View>
-      </CameraView>
+        )}
+      </View>
     </View>
   );
 }
@@ -64,7 +63,7 @@ export default function BarcodeScanner({ onBarcodeScanned, category = 'food' }) 
 const styles = StyleSheet.create({
   container: { flex: 1, minHeight: 520, backgroundColor: '#090b10' },
   camera: { flex: 1 },
-  overlay: { flex: 1, alignItems: 'center', paddingTop: 48, backgroundColor: 'rgba(9, 11, 16, 0.2)' },
+  overlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center', paddingTop: 48, backgroundColor: 'rgba(9, 11, 16, 0.2)' },
   heading: { color: '#f4f5f0', fontSize: 24, fontWeight: '800', letterSpacing: 1.5 },
   instruction: { color: '#cbd0d4', fontSize: 14, marginTop: 10 },
   scanFrame: { width: 270, height: 170, borderWidth: 2, borderColor: '#c9f477', marginTop: 74, borderRadius: 8 },
