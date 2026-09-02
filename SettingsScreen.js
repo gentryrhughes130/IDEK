@@ -20,8 +20,8 @@ export default function SettingsScreen({ theme, onThemeChange, apiKey, onApiKeyC
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Restaurant previews</Text>
-        <Text style={styles.help}>Add a restricted Google Places key to show restaurant ratings, review counts, and previews inside the app.</Text>
-        <TextInput value={apiKey} onChangeText={onApiKeyChange} placeholder="Google Places API key" placeholderTextColor="#9aa59e" secureTextEntry style={styles.input} autoCapitalize="none" />
+        <Text style={styles.help}>Add a Yelp Fusion API key to show restaurant ratings, review counts, and review previews inside the app.</Text>
+        <TextInput value={apiKey} onChangeText={onApiKeyChange} placeholder="Yelp Fusion API key" placeholderTextColor="#9aa59e" secureTextEntry style={styles.input} autoCapitalize="none" />
         <Text style={styles.caption}>{apiKey ? 'Key saved on this device.' : 'No key saved yet.'}</Text>
       </View>
 
@@ -30,7 +30,7 @@ export default function SettingsScreen({ theme, onThemeChange, apiKey, onApiKeyC
         <Text style={styles.help}>Sensitivities, mood, hydration, journal entries, and this API key are stored locally on this device.</Text>
         <Pressable style={styles.clearButton} onPress={onClearData}><Text style={styles.clearText}>CLEAR WELLNESS DATA</Text></Pressable>
       </View>
-      <Text style={styles.footer}>Sources: Open Food Facts, Open Beauty Facts, TheMealDB, and Google Places when configured.</Text>
+      <Text style={styles.footer}>Sources: Open Food Facts, Open Beauty Facts, TheMealDB, and Yelp when configured.</Text>
     </ScrollView>
   );
 }

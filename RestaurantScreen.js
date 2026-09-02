@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const cuisineOptions = ['Any cuisine', 'Gluten-aware', 'Dairy-free', 'Vegan', 'Mexican', 'Asian', 'Mediterranean'];
-const fieldMask = 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.reviews,places.googleMapsUri,places.primaryType';
-
 function Stars({ rating }) {
   const rounded = Math.round(Number(rating || 0));
   return <View style={styles.stars}><Text style={styles.starText}>{[1, 2, 3, 4, 5].map((star) => star <= rounded ? '★' : '☆').join(' ')}</Text><Text style={styles.ratingText}>{rating ? Number(rating).toFixed(1) : 'New'}</Text></View>;
@@ -17,9 +15,9 @@ export default function RestaurantScreen({ apiKey: configuredApiKey }) {
   const [message, setMessage] = useState('Search for a cuisine, restaurant, or city.');
 
   const searchRestaurants = async () => {
-    const apiKey = configuredApiKey || process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+    const apiKey = configuredApiKey || process.env.EXPO_PUBLIC_YELP_API_KEY;
     if (!apiKey) {
-      setMessage('Restaurant previews need a Google Places API key in EXPO_PUBLIC_GOOGLE_PLACES_API_KEY.');
+      setMessage('Restaurant previews need a Yelp API key in EXPO_PUBLIC_YELP_API_KEY.');
       return;
     }
     const searchText = cuisine === 'Any cuisine' ? query.trim() : `${cuisine} ${query.trim()}`;
@@ -27,15 +25,22 @@ export default function RestaurantScreen({ apiKey: configuredApiKey }) {
     setLoading(true);
     setMessage('Finding restaurants and reviews...');
     try {
-      const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': fieldMask },
-        body: JSON.stringify({ textQuery: searchText, maxResultCount: 10 }),
+      const response = await fetch(`https://api.yelp.com/v3/businesses/search?term=${encodeURIComponent(searchText)}&limit=10&sort_by=best_match`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (!response.ok) throw new Error(`Restaurant search failed with ${response.status}`);
       const data = await response.json();
-      setResults(data.places || []);
-      setMessage(data.places?.length ? '' : 'No restaurants found. Try a broader search.');
+      const businesses = await Promise.all((data.businesses || []).map(async (business) => {
+        try {
+          const reviewsResponse = await fetch(`https://api.yelp.com/v3/businesses/${business.id}/reviews`, { headers: { Authorization: `Bearer ${apiKey}` } });
+          const reviewData = reviewsResponse.ok ? await reviewsResponse.json() : { reviews: [] };
+          return { ...business, reviews: reviewData.reviews || [] };
+        } catch {
+          return business;
+        }
+      }));
+      setResults(businesses);
+      setMessage(businesses.length ? '' : 'No restaurants found. Try a broader search.');
     } catch {
       setMessage('Restaurant search is unavailable. Check the Places API key and connection.');
     } finally {
@@ -58,15 +63,15 @@ export default function RestaurantScreen({ apiKey: configuredApiKey }) {
       {!!message && <Text style={styles.message}>{message}</Text>}
       {results.map((place) => {
         const review = place.reviews?.[0];
-        return <View key={place.googleMapsUri || place.formattedAddress} style={styles.resultCard}>
-          <View style={styles.resultHeader}><View style={styles.resultHeading}><Text style={styles.placeType}>{place.primaryType?.replace(/_/g, ' ') || 'RESTAURANT'}</Text><Text style={styles.placeName}>{place.displayName?.text || 'Restaurant'}</Text></View><Stars rating={place.rating} /></View>
-          <Text style={styles.address}>{place.formattedAddress || 'Address unavailable'}</Text>
-          <Text style={styles.reviewCount}>{place.userRatingCount ? `${place.userRatingCount.toLocaleString()} reviews` : 'No review count listed'}</Text>
-          {review?.text?.text ? <Text style={styles.review} numberOfLines={3}>“{review.text.text}”</Text> : <Text style={styles.reviewMuted}>No community review excerpt available.</Text>}
-          <Pressable style={styles.mapButton} onPress={() => Linking.openURL(place.googleMapsUri)}><Text style={styles.mapButtonText}>OPEN IN MAPS  -&gt;</Text></Pressable>
+        return <View key={place.id} style={styles.resultCard}>
+          <View style={styles.resultHeader}><View style={styles.resultHeading}><Text style={styles.placeType}>{place.categories?.[0]?.title || 'RESTAURANT'}</Text><Text style={styles.placeName}>{place.name || 'Restaurant'}</Text></View><Stars rating={place.rating} /></View>
+          <Text style={styles.address}>{place.location?.display_address?.join(', ') || 'Address unavailable'}</Text>
+          <Text style={styles.reviewCount}>{place.review_count ? `${place.review_count.toLocaleString()} reviews` : 'No review count listed'}</Text>
+          {review?.text ? <Text style={styles.review} numberOfLines={3}>“{review.text}”</Text> : <Text style={styles.reviewMuted}>No community review excerpt available.</Text>}
+          <Pressable style={styles.mapButton} onPress={() => Linking.openURL(place.url)}><Text style={styles.mapButtonText}>OPEN YELP MAP  -&gt;</Text></Pressable>
         </View>;
       })}
-      <Text style={styles.disclaimer}>Restaurant ratings and reviews are provided by Google Places. Verify menu ingredients directly with the restaurant.</Text>
+      <Text style={styles.disclaimer}>Restaurant ratings and reviews are provided by Yelp. Verify menu ingredients directly with the restaurant.</Text>
     </ScrollView>
   );
 }
