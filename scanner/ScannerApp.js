@@ -12,13 +12,13 @@ export default function ScannerApp({ selectedSensitivities, onSensitivitiesChang
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('scan');
   const [category, setCategory] = useState(null);
-  const [profileReady, setProfileReady] = useState(false);
+  const [profileReady, setProfileReady] = useState(Boolean(selectedSensitivities));
   const [localSensitivities, setLocalSensitivities] = useState(selectedSensitivities || defaultSensitivities);
   const [message, setMessage] = useState('');
 
   const handleBarcodeScanned = async ({ data }) => {
     setStatus('loading');
-    setMessage('Looking up that food...');
+    setMessage(`Looking up that ${category === 'food' ? 'food' : 'toiletry'}...`);
     try {
       const result = category === 'food'
         ? await lookupProduct(data, selectedSensitivities || localSensitivities)
@@ -85,18 +85,18 @@ export default function ScannerApp({ selectedSensitivities, onSensitivitiesChang
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#090b10' },
+  screen: { flex: 1, backgroundColor: '#f5f3ec' },
   center: { flex: 1, minHeight: 520, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  title: { color: '#f4f5f0', fontSize: 18, lineHeight: 26, fontWeight: '700', textAlign: 'center' },
-  resetButton: { backgroundColor: '#c9f477', alignSelf: 'center', paddingHorizontal: 18, paddingVertical: 15, margin: 22, borderRadius: 4 },
-  resetText: { color: '#151a12', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+  title: { color: '#1b2b25', fontSize: 18, lineHeight: 26, fontWeight: '700', textAlign: 'center' },
+  resetButton: { backgroundColor: '#395f4b', alignSelf: 'center', paddingHorizontal: 18, paddingVertical: 15, margin: 22, borderRadius: 4 },
+  resetText: { color: '#f5f3ec', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
   choosePanel: { padding: 22, marginTop: 52 },
-  kicker: { color: '#7b838f', fontSize: 10, letterSpacing: 1.8, fontWeight: '800' },
-  chooseTitle: { color: '#f4f5f0', fontSize: 34, fontWeight: '800', marginTop: 14 },
-  chooseDetail: { color: '#a4aab4', fontSize: 15, lineHeight: 22, marginTop: 10, marginBottom: 28 },
-  categoryButton: { minHeight: 78, backgroundColor: '#12161b', borderWidth: 1, borderColor: '#303841', marginBottom: 12, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 },
-  categoryIcon: { color: '#c9f477', fontSize: 11, fontWeight: '900' },
-  categoryTitle: { color: '#f4f5f0', fontSize: 14, fontWeight: '900', letterSpacing: 1 },
-  categoryDetail: { color: '#7b838f', fontSize: 12, marginTop: 5 },
-  categoryArrow: { color: '#c9f477', fontSize: 18, marginLeft: 'auto' },
+  kicker: { color: '#758078', fontSize: 10, letterSpacing: 1.8, fontWeight: '800' },
+  chooseTitle: { color: '#1b2b25', fontSize: 34, fontWeight: '800', marginTop: 14 },
+  chooseDetail: { color: '#6c7971', fontSize: 15, lineHeight: 22, marginTop: 10, marginBottom: 28 },
+  categoryButton: { minHeight: 78, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e4e2da', marginBottom: 12, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 },
+  categoryIcon: { color: '#4d7958', fontSize: 11, fontWeight: '900' },
+  categoryTitle: { color: '#1b2b25', fontSize: 14, fontWeight: '900', letterSpacing: 1 },
+  categoryDetail: { color: '#78847d', fontSize: 12, marginTop: 5 },
+  categoryArrow: { color: '#4d7958', fontSize: 18, marginLeft: 'auto' },
 });

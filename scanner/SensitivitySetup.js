@@ -28,16 +28,16 @@ export default function SensitivitySetup({ selectedIds, onChange, onContinue }) 
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 22, paddingTop: 55, paddingBottom: 40, backgroundColor: '#090b10', flexGrow: 1 },
-  kicker: { color: '#7b838f', fontSize: 10, letterSpacing: 1.8, fontWeight: '800' },
-  title: { color: '#f4f5f0', fontSize: 32, lineHeight: 38, fontWeight: '800', marginTop: 14 },
-  detail: { color: '#a4aab4', fontSize: 14, lineHeight: 21, marginTop: 10 },
+  container: { padding: 22, paddingTop: 40, paddingBottom: 40, backgroundColor: '#f5f3ec', flexGrow: 1 },
+  kicker: { color: '#758078', fontSize: 10, letterSpacing: 1.8, fontWeight: '800' },
+  title: { color: '#1b2b25', fontSize: 32, lineHeight: 38, fontWeight: '800', marginTop: 14 },
+  detail: { color: '#6c7971', fontSize: 14, lineHeight: 21, marginTop: 10 },
   list: { marginTop: 25 },
-  option: { minHeight: 48, borderWidth: 1, borderColor: '#303841', marginBottom: 8, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  selected: { borderColor: '#c9f477', backgroundColor: '#121a13' },
-  mark: { color: '#7b838f', fontSize: 20, width: 20 },
-  label: { color: '#d4d8d3', fontSize: 14 },
-  selectedText: { color: '#c9f477', fontWeight: '800' },
-  button: { backgroundColor: '#c9f477', minHeight: 54, alignItems: 'center', justifyContent: 'center', marginTop: 18 },
-  buttonText: { color: '#151a12', fontSize: 11, letterSpacing: 1, fontWeight: '900' },
+  option: { minHeight: 48, borderWidth: 1, borderColor: '#d8d9d0', backgroundColor: '#ffffff', marginBottom: 8, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  selected: { borderColor: '#4d7958', backgroundColor: '#e7f0df' },
+  mark: { color: '#879189', fontSize: 20, width: 20 },
+  label: { color: '#30453a', fontSize: 14 },
+  selectedText: { color: '#356249', fontWeight: '800' },
+  button: { backgroundColor: '#395f4b', minHeight: 54, alignItems: 'center', justifyContent: 'center', marginTop: 18 },
+  buttonText: { color: '#f5f3ec', fontSize: 11, letterSpacing: 1, fontWeight: '900' },
 });

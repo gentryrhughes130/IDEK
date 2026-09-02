@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import ScannerApp from './scanner/ScannerApp';
 import SensitivitySetup from './scanner/SensitivitySetup';
@@ -74,6 +75,27 @@ export default function App() {
   const [hydration, setHydration] = useState(0);
   const [entries, setEntries] = useState([]);
   const [sensitivities, setSensitivities] = useState(defaultSensitivities);
+  const [storageReady, setStorageReady] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem('wellness-app-state')
+      .then((saved) => {
+        if (!saved) return;
+        const state = JSON.parse(saved);
+        if (state.mood) setMood(state.mood);
+        if (Number.isInteger(state.hydration)) setHydration(state.hydration);
+        if (Array.isArray(state.entries)) setEntries(state.entries);
+        if (Array.isArray(state.sensitivities)) setSensitivities(state.sensitivities);
+      })
+      .catch(() => {})
+      .finally(() => setStorageReady(true));
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    AsyncStorage.setItem('wellness-app-state', JSON.stringify({ mood, hydration, entries, sensitivities })).catch(() => {});
+  }, [mood, hydration, entries, sensitivities, storageReady]);
+
   const renderScreen = activeTab === 'scan' ? <ScannerApp selectedSensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : activeTab === 'journal' ? <JournalScreen entries={entries} onAddEntry={(entry) => setEntries((current) => [entry, ...current])} /> : activeTab === 'profile' ? <ProfileScreen sensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : <TodayScreen onScan={() => setActiveTab('scan')} onJournal={() => setActiveTab('journal')} mood={mood} onMoodChange={setMood} hydration={hydration} onHydrationChange={setHydration} />;
 
   return <SafeAreaView style={styles.screen}><StatusBar style={activeTab === 'scan' ? 'light' : 'dark'} />{renderScreen}<View style={styles.tabBar}>{tabs.map((tab) => <Pressable key={tab.id} style={styles.tab} onPress={() => setActiveTab(tab.id)} accessibilityLabel={`Open ${tab.label}`}><Text style={[styles.tabIcon, activeTab === tab.id && styles.tabActive]}>{tab.icon}</Text><Text style={[styles.tabLabel, activeTab === tab.id && styles.tabActive]}>{tab.label}</Text></Pressable>)}</View></SafeAreaView>;
