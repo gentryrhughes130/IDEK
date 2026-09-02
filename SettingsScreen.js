@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const themes = [
   { id: 'sage', label: 'Sage and cream', color: '#395f4b' },
@@ -6,7 +6,7 @@ const themes = [
   { id: 'night', label: 'Night and lime', color: '#1c2821' },
 ];
 
-export default function SettingsScreen({ theme, onThemeChange, apiKey, onApiKeyChange, onClearData }) {
+export default function SettingsScreen({ theme, onThemeChange, onClearData }) {
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.kicker}>SETTINGS</Text>
@@ -19,18 +19,11 @@ export default function SettingsScreen({ theme, onThemeChange, apiKey, onApiKeyC
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Restaurant previews</Text>
-        <Text style={styles.help}>Add a Yelp Fusion API key to show restaurant ratings, review counts, and review previews inside the app.</Text>
-        <TextInput value={apiKey} onChangeText={onApiKeyChange} placeholder="Yelp Fusion API key" placeholderTextColor="#9aa59e" secureTextEntry style={styles.input} autoCapitalize="none" />
-        <Text style={styles.caption}>{apiKey ? 'Key saved on this device.' : 'No key saved yet.'}</Text>
-      </View>
-
-      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Local information</Text>
         <Text style={styles.help}>Sensitivities, mood, hydration, journal entries, and this API key are stored locally on this device.</Text>
         <Pressable style={styles.clearButton} onPress={onClearData}><Text style={styles.clearText}>CLEAR WELLNESS DATA</Text></Pressable>
       </View>
-      <Text style={styles.footer}>Sources: Open Food Facts, Open Beauty Facts, TheMealDB, and Yelp when configured.</Text>
+      <Text style={styles.footer}>Sources: Open Food Facts, Open Beauty Facts, TheMealDB, and OpenStreetMap.</Text>
     </ScrollView>
   );
 }

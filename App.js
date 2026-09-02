@@ -71,7 +71,7 @@ function JournalScreen({ entries, onAddEntry }) {
 
 function ProfileScreen({ sensitivities, onSensitivitiesChange }) {
   const [editing, setEditing] = useState(false);
-  return <ScrollView contentContainerStyle={styles.content}><Text style={styles.kicker}>YOUR WELLNESS PROFILE</Text><Text style={styles.title}>Gentry Ryan Hughes.</Text><Text style={styles.pageIntro}>Your selected sensitivities shape the information shown after each scan.</Text>{editing ? <View style={styles.profileEditor}><SensitivitySetup selectedIds={sensitivities} onChange={onSensitivitiesChange} onContinue={() => setEditing(false)} /></View> : <><View style={styles.profileCard}><Text style={styles.cardKicker}>PROFILE STATUS</Text><Text style={styles.profileStatus}>Personalized screening is on</Text><Text style={styles.profileDetail}>{sensitivities.length} sensitivities selected for scan results.</Text><Pressable onPress={() => setEditing(true)}><Text style={styles.linkText}>EDIT SENSITIVITIES  -&gt;</Text></Pressable></View><View style={styles.profileCard}><Text style={styles.cardKicker}>DATA & SOURCES</Text><Text style={styles.profileDetail}>Results use Open Food Facts, Open Beauty Facts, TheMealDB, and Yelp when configured. Journal data is kept local while cloud sync is prepared.</Text></View></>}</ScrollView>;
+  return <ScrollView contentContainerStyle={styles.content}><Text style={styles.kicker}>YOUR WELLNESS PROFILE</Text><Text style={styles.title}>Gentry Ryan Hughes.</Text><Text style={styles.pageIntro}>Your selected sensitivities shape the information shown after each scan.</Text>{editing ? <View style={styles.profileEditor}><SensitivitySetup selectedIds={sensitivities} onChange={onSensitivitiesChange} onContinue={() => setEditing(false)} /></View> : <><View style={styles.profileCard}><Text style={styles.cardKicker}>PROFILE STATUS</Text><Text style={styles.profileStatus}>Personalized screening is on</Text><Text style={styles.profileDetail}>{sensitivities.length} sensitivities selected for scan results.</Text><Pressable onPress={() => setEditing(true)}><Text style={styles.linkText}>EDIT SENSITIVITIES  -&gt;</Text></Pressable></View><View style={styles.profileCard}><Text style={styles.cardKicker}>DATA & SOURCES</Text><Text style={styles.profileDetail}>Results use Open Food Facts, Open Beauty Facts, TheMealDB, and OpenStreetMap. Journal data is kept local while cloud sync is prepared.</Text></View></>}</ScrollView>;
 }
 
 export default function App() {
@@ -80,7 +80,6 @@ export default function App() {
   const [hydration, setHydration] = useState(0);
   const [entries, setEntries] = useState([]);
   const [sensitivities, setSensitivities] = useState(defaultSensitivities);
-  const [apiKey, setApiKey] = useState('');
   const [theme, setTheme] = useState('sage');
   const [storageReady, setStorageReady] = useState(false);
 
@@ -93,7 +92,6 @@ export default function App() {
         if (Number.isInteger(state.hydration)) setHydration(state.hydration);
         if (Array.isArray(state.entries)) setEntries(state.entries);
         if (Array.isArray(state.sensitivities)) setSensitivities(state.sensitivities);
-        if (typeof state.apiKey === 'string') setApiKey(state.apiKey);
         if (state.theme) setTheme(state.theme);
       })
       .catch(() => {})
@@ -102,11 +100,11 @@ export default function App() {
 
   useEffect(() => {
     if (!storageReady) return;
-    AsyncStorage.setItem('wellness-app-state', JSON.stringify({ mood, hydration, entries, sensitivities, apiKey, theme })).catch(() => {});
-  }, [mood, hydration, entries, sensitivities, apiKey, theme, storageReady]);
+    AsyncStorage.setItem('wellness-app-state', JSON.stringify({ mood, hydration, entries, sensitivities, theme })).catch(() => {});
+  }, [mood, hydration, entries, sensitivities, theme, storageReady]);
 
-  const clearData = () => { setMood('Okay'); setHydration(0); setEntries([]); setSensitivities(defaultSensitivities); setApiKey(''); setTheme('sage'); };
-  const renderScreen = activeTab === 'scan' ? <ScannerApp selectedSensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : activeTab === 'restaurants' ? <RestaurantScreen apiKey={apiKey} /> : activeTab === 'recipes' ? <RecipeScreen /> : activeTab === 'settings' ? <SettingsScreen theme={theme} onThemeChange={setTheme} apiKey={apiKey} onApiKeyChange={setApiKey} onClearData={clearData} /> : <ProfileScreen sensitivities={sensitivities} onSensitivitiesChange={setSensitivities} />;
+  const clearData = () => { setMood('Okay'); setHydration(0); setEntries([]); setSensitivities(defaultSensitivities); setTheme('sage'); };
+  const renderScreen = activeTab === 'scan' ? <ScannerApp selectedSensitivities={sensitivities} onSensitivitiesChange={setSensitivities} /> : activeTab === 'restaurants' ? <RestaurantScreen /> : activeTab === 'recipes' ? <RecipeScreen /> : activeTab === 'settings' ? <SettingsScreen theme={theme} onThemeChange={setTheme} onClearData={clearData} /> : <ProfileScreen sensitivities={sensitivities} onSensitivitiesChange={setSensitivities} />;
 
   return <SafeAreaProvider><SafeAreaView style={styles.screen}><StatusBar style={activeTab === 'scan' ? 'light' : 'dark'} />{renderScreen}<View style={styles.tabBar}>{tabs.map((tab) => <Pressable key={tab.id} style={styles.tab} onPress={() => setActiveTab(tab.id)} accessibilityLabel={`Open ${tab.label}`}><Text style={[styles.tabIcon, activeTab === tab.id && styles.tabActive]}>{tab.icon}</Text><Text style={[styles.tabLabel, activeTab === tab.id && styles.tabActive]}>{tab.label}</Text></Pressable>)}</View></SafeAreaView></SafeAreaProvider>;
 }
