@@ -8,12 +8,12 @@ import { lookupHygieneProduct } from './hygieneLookup';
 import SensitivitySetup from './SensitivitySetup';
 import { defaultSensitivities } from './sensitivityProfile';
 
-export default function ScannerApp() {
+export default function ScannerApp({ selectedSensitivities, onSensitivitiesChange }) {
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('scan');
   const [category, setCategory] = useState(null);
   const [profileReady, setProfileReady] = useState(false);
-  const [selectedSensitivities, setSelectedSensitivities] = useState(defaultSensitivities);
+  const [localSensitivities, setLocalSensitivities] = useState(selectedSensitivities || defaultSensitivities);
   const [message, setMessage] = useState('');
 
   const handleBarcodeScanned = async ({ data }) => {
@@ -21,8 +21,8 @@ export default function ScannerApp() {
     setMessage('Looking up that food...');
     try {
       const result = category === 'food'
-        ? await lookupProduct(data, selectedSensitivities)
-        : await lookupHygieneProduct(data, selectedSensitivities);
+        ? await lookupProduct(data, selectedSensitivities || localSensitivities)
+        : await lookupHygieneProduct(data, selectedSensitivities || localSensitivities);
       if (!result) {
         setStatus('error');
         setMessage('We could not find that product. Try another barcode.');
@@ -66,7 +66,7 @@ export default function ScannerApp() {
           </Pressable>
         </View>
       ) : !profileReady ? (
-        <SensitivitySetup selectedIds={selectedSensitivities} onChange={setSelectedSensitivities} onContinue={() => setProfileReady(true)} />
+        <SensitivitySetup selectedIds={selectedSensitivities || localSensitivities} onChange={onSensitivitiesChange || setLocalSensitivities} onContinue={() => setProfileReady(true)} />
       ) : null}
       {category && profileReady && status === 'loading' ? (
         <View style={styles.center}><Text style={styles.title}>{message}</Text></View>
