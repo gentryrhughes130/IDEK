@@ -8,7 +8,7 @@ import { lookupHygieneProduct } from './hygieneLookup';
 import SensitivitySetup from './SensitivitySetup';
 import { defaultSensitivities } from './sensitivityProfile';
 
-export default function ScannerApp({ onExit }) {
+export default function ScannerApp() {
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('scan');
   const [category, setCategory] = useState(null);
@@ -39,9 +39,6 @@ export default function ScannerApp({ onExit }) {
   if (status === 'result') {
     return (
       <View style={styles.screen}>
-        <Pressable style={styles.backButton} onPress={onExit}>
-          <Text style={styles.backText}>&lt;- WELCOME</Text>
-        </Pressable>
         {category === 'food' ? <FoodRating product={product} /> : <HygieneRating product={product} />}
         <Pressable style={styles.resetButton} onPress={() => { setProduct(null); setStatus('scan'); }}>
           <Text style={styles.resetText}>SCAN ANOTHER {category === 'food' ? 'FOOD' : 'TOILETRY'}</Text>
@@ -52,9 +49,6 @@ export default function ScannerApp({ onExit }) {
 
   return (
     <View style={styles.screen}>
-      <Pressable style={styles.backButton} onPress={onExit}>
-        <Text style={styles.backText}>&lt;- WELCOME</Text>
-      </Pressable>
       {!category ? (
         <View style={styles.choosePanel}>
           <Text style={styles.kicker}>WHAT ARE YOU SCANNING?</Text>
@@ -96,8 +90,6 @@ const styles = StyleSheet.create({
   title: { color: '#f4f5f0', fontSize: 18, lineHeight: 26, fontWeight: '700', textAlign: 'center' },
   resetButton: { backgroundColor: '#c9f477', alignSelf: 'center', paddingHorizontal: 18, paddingVertical: 15, margin: 22, borderRadius: 4 },
   resetText: { color: '#151a12', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
-  backButton: { alignSelf: 'flex-start', paddingHorizontal: 22, paddingTop: 28, paddingBottom: 8 },
-  backText: { color: '#c9f477', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
   choosePanel: { padding: 22, marginTop: 52 },
   kicker: { color: '#7b838f', fontSize: 10, letterSpacing: 1.8, fontWeight: '800' },
   chooseTitle: { color: '#f4f5f0', fontSize: 34, fontWeight: '800', marginTop: 14 },

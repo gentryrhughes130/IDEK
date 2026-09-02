@@ -1,114 +1,121 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import ScannerApp from './scanner/ScannerApp';
 
-const interests = ['Linux', 'RAGBRAI'];
+const tabs = [
+  { id: 'today', label: 'Today', icon: '○' },
+  { id: 'scan', label: 'Scan', icon: '⌾' },
+  { id: 'journal', label: 'Journal', icon: '▤' },
+  { id: 'profile', label: 'Profile', icon: '◉' },
+];
 
-export default function App() {
-  const [showScanner, setShowScanner] = useState(false);
+const habits = [
+  { label: 'Hydration', value: '0 / 8 glasses', icon: '◌' },
+  { label: 'Sleep', value: 'No entry yet', icon: '☾' },
+  { label: 'Movement', value: 'No entry yet', icon: '↗' },
+];
 
-  if (showScanner) {
-    return <ScannerApp onExit={() => setShowScanner(false)} />;
-  }
-
+function TodayScreen({ onScan }) {
   return (
-    <View style={styles.screen}>
-      <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.topLine}>
-          <Text style={styles.eyebrow}>WELCOME / 01</Text>
-          <View style={styles.liveMark}>
-            <View style={styles.liveDot} />
-            <Text style={styles.liveText}>ONLINE</Text>
-          </View>
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.kicker}>WEDNESDAY, SEP 02</Text>
+          <Text style={styles.title}>Good morning.</Text>
         </View>
+        <View style={styles.avatar}><Text style={styles.avatarText}>GR</Text></View>
+      </View>
 
-        <View style={styles.hero}>
-          <View style={styles.avatarPlaceholder}>
-            <Text style={styles.avatarInitials}>GRH</Text>
-            <Text style={styles.avatarHint}>PHOTO</Text>
-          </View>
-          <Text style={styles.greeting}>Hey, I'm</Text>
-          <Text style={styles.name}>Gentry Ryan{`\n`}Hughes</Text>
-          <Text style={styles.handle}>AKA VIMSR</Text>
-          <Text style={styles.welcomeCopy}>you got it</Text>
+      <View style={styles.statusCard}>
+        <View style={styles.statusTop}><Text style={styles.cardKicker}>TODAY'S CHECK-IN</Text><Text style={styles.statusBadge}>READY</Text></View>
+        <Text style={styles.statusTitle}>How are you feeling?</Text>
+        <Text style={styles.statusDetail}>A quick check-in helps keep your wellness notes useful.</Text>
+        <View style={styles.moodRow}>
+          {['Great', 'Okay', 'Low'].map((mood, index) => <Pressable key={mood} style={[styles.moodButton, index === 1 && styles.moodSelected]}><Text style={styles.moodText}>{mood}</Text></Pressable>)}
         </View>
+      </View>
 
-        <View style={styles.divider} />
+      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Quick scan</Text><Text style={styles.sectionMeta}>Food + personal care</Text></View>
+      <Pressable style={styles.scanCard} onPress={onScan} accessibilityLabel="Open food and toiletries scanner">
+        <View style={styles.scanIcon}><Text style={styles.scanIconText}>⌾</Text></View>
+        <View style={styles.scanCopy}><Text style={styles.scanTitle}>Check before you choose</Text><Text style={styles.scanDetail}>Scan a food or toiletry for personalized ingredient signals.</Text></View>
+        <Text style={styles.chevron}>-&gt;</Text>
+      </Pressable>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionKicker}>A LITTLE ABOUT ME</Text>
-          <Text style={styles.sectionTitle}>
-            Curious by default.<Text style={styles.accentText}> Building on purpose.</Text>
-          </Text>
-          <View style={styles.interestRow}>
-            {interests.map((interest) => (
-              <View key={interest} style={styles.interestTag}>
-                <Text style={styles.interestText}>{interest}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+      <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Daily rhythm</Text><Text style={styles.sectionMeta}>Start where you are</Text></View>
+      <View style={styles.habitGrid}>{habits.map((habit) => <View key={habit.label} style={styles.habitCard}><Text style={styles.habitIcon}>{habit.icon}</Text><Text style={styles.habitLabel}>{habit.label}</Text><Text style={styles.habitValue}>{habit.value}</Text></View>)}</View>
 
-        <View style={styles.focusPanel}>
-          <Text style={styles.sectionKicker}>CURRENT FOCUS</Text>
-          <Text style={styles.focusTitle}>Finish this app</Text>
-          <Text style={styles.focusDetail}>Then bring VimHostage to Instagram.</Text>
-          <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
-          </View>
-          <Text style={styles.progressLabel}>IN MOTION</Text>
-        </View>
-
-        <View style={styles.actionsRow}>
-          <Pressable style={styles.primaryButton} accessibilityLabel="Start exploring" onPress={() => setShowScanner(true)}>
-            <Text style={styles.primaryButtonText}>START EXPLORING</Text>
-            <Text style={styles.arrow}>-&gt;</Text>
-          </Pressable>
-          <Pressable style={styles.secondaryButton} accessibilityLabel="View profile">
-            <Text style={styles.secondaryButtonText}>PROFILE</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </View>
+      <View style={styles.noteCard}><Text style={styles.cardKicker}>WELLNESS NOTE</Text><Text style={styles.noteTitle}>Your patterns belong to you.</Text><Text style={styles.noteDetail}>Keep a private record of reactions and questions to bring to a trusted clinician.</Text><Pressable><Text style={styles.linkText}>OPEN JOURNAL  -&gt;</Text></Pressable></View>
+    </ScrollView>
   );
 }
 
+function JournalScreen() {
+  return <ScrollView contentContainerStyle={styles.content}><Text style={styles.kicker}>PRIVATE JOURNAL</Text><Text style={styles.title}>Your notes.</Text><Text style={styles.pageIntro}>Record reactions, questions, and patterns in your own words.</Text><View style={styles.emptyCard}><Text style={styles.emptyIcon}>＋</Text><Text style={styles.emptyTitle}>No entries yet</Text><Text style={styles.emptyDetail}>Your journal is ready when you are.</Text><Pressable style={styles.primaryButton}><Text style={styles.primaryButtonText}>ADD A NOTE</Text></Pressable></View></ScrollView>;
+}
+
+function ProfileScreen() {
+  return <ScrollView contentContainerStyle={styles.content}><Text style={styles.kicker}>YOUR WELLNESS PROFILE</Text><Text style={styles.title}>Gentry Ryan Hughes.</Text><Text style={styles.pageIntro}>Your selected sensitivities shape the information shown after each scan.</Text><View style={styles.profileCard}><Text style={styles.cardKicker}>PROFILE STATUS</Text><Text style={styles.profileStatus}>Personalized screening is on</Text><Text style={styles.profileDetail}>Food triggers, toiletry ingredients, and community context are checked when available.</Text><Text style={styles.linkText}>EDIT SENSITIVITIES  -&gt;</Text></View><View style={styles.profileCard}><Text style={styles.cardKicker}>DATA & SOURCES</Text><Text style={styles.profileDetail}>Results use Open Food Facts and Open Beauty Facts. Journal data is prepared for future cloud sync.</Text></View></ScrollView>;
+}
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('today');
+  const renderScreen = activeTab === 'scan' ? <ScannerApp /> : activeTab === 'journal' ? <JournalScreen /> : activeTab === 'profile' ? <ProfileScreen /> : <TodayScreen onScan={() => setActiveTab('scan')} />;
+
+  return <SafeAreaView style={styles.screen}><StatusBar style={activeTab === 'scan' ? 'light' : 'dark'} />{renderScreen}<View style={styles.tabBar}>{tabs.map((tab) => <Pressable key={tab.id} style={styles.tab} onPress={() => setActiveTab(tab.id)} accessibilityLabel={`Open ${tab.label}`}><Text style={[styles.tabIcon, activeTab === tab.id && styles.tabActive]}>{tab.icon}</Text><Text style={[styles.tabLabel, activeTab === tab.id && styles.tabActive]}>{tab.label}</Text></Pressable>)}</View></SafeAreaView>;
+}
+
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#090b10' },
-  content: { paddingHorizontal: 20, paddingTop: 54, paddingBottom: 42 },
-  topLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 42 },
-  eyebrow: { color: '#8b929f', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
-  liveMark: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#b8f36b' },
-  liveText: { color: '#b8f36b', fontSize: 10, fontWeight: '700', letterSpacing: 1.4 },
-  hero: { paddingBottom: 38 },
-  avatarPlaceholder: { width: 88, height: 88, borderRadius: 44, backgroundColor: '#c9f477', alignItems: 'center', justifyContent: 'center', marginBottom: 28 },
-  avatarInitials: { color: '#151a12', fontSize: 25, fontWeight: '900', letterSpacing: 1 },
-  avatarHint: { color: '#53633e', fontSize: 8, fontWeight: '800', letterSpacing: 1.5, marginTop: 3 },
-  greeting: { color: '#a4aab4', fontSize: 18, fontWeight: '500', marginBottom: 6 },
-  name: { color: '#f4f5f0', fontSize: 46, lineHeight: 48, fontWeight: '800', letterSpacing: -1.5 },
-  handle: { color: '#c9f477', fontSize: 13, letterSpacing: 3, fontWeight: '800', marginTop: 18 },
-  welcomeCopy: { color: '#727985', fontSize: 15, marginTop: 24, fontStyle: 'italic' },
-  divider: { height: 1, backgroundColor: '#252a31', marginBottom: 34 },
-  section: { marginBottom: 28 },
-  sectionKicker: { color: '#7b838f', fontSize: 10, letterSpacing: 1.8, fontWeight: '800', marginBottom: 14 },
-  sectionTitle: { color: '#f0f1ed', fontSize: 24, lineHeight: 31, fontWeight: '700' },
-  accentText: { color: '#c9f477' },
-  interestRow: { flexDirection: 'row', gap: 10, marginTop: 20 },
-  interestTag: { borderWidth: 1, borderColor: '#3c444d', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 4 },
-  interestText: { color: '#cbd0d4', fontSize: 13, fontWeight: '700' },
-  focusPanel: { backgroundColor: '#12161b', padding: 22, borderLeftWidth: 3, borderLeftColor: '#c9f477', marginBottom: 28 },
-  focusTitle: { color: '#f4f5f0', fontSize: 25, fontWeight: '800', marginBottom: 6 },
-  focusDetail: { color: '#a4aab4', fontSize: 15, lineHeight: 22 },
-  progressTrack: { height: 4, backgroundColor: '#2b3239', marginTop: 22, marginBottom: 10 },
-  progressFill: { height: 4, width: '62%', backgroundColor: '#c9f477' },
-  progressLabel: { color: '#c9f477', fontSize: 9, letterSpacing: 1.5, fontWeight: '800' },
-  actionsRow: { flexDirection: 'row', gap: 10 },
-  primaryButton: { flex: 1, backgroundColor: '#c9f477', minHeight: 54, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  primaryButtonText: { color: '#151a12', fontSize: 11, letterSpacing: 1, fontWeight: '900' },
-  arrow: { color: '#151a12', fontSize: 18, fontWeight: '700' },
-  secondaryButton: { borderWidth: 1, borderColor: '#49515b', minHeight: 54, paddingHorizontal: 18, alignItems: 'center', justifyContent: 'center' },
-  secondaryButtonText: { color: '#d4d8d3', fontSize: 11, letterSpacing: 1, fontWeight: '800' },
+  screen: { flex: 1, backgroundColor: '#f5f3ec' },
+  content: { paddingHorizontal: 20, paddingTop: 28, paddingBottom: 34 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 },
+  kicker: { color: '#758078', fontSize: 10, fontWeight: '800', letterSpacing: 1.7 },
+  title: { color: '#1b2b25', fontSize: 34, lineHeight: 40, fontWeight: '800', marginTop: 9 },
+  avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#b8cdb8', alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: '#1b2b25', fontSize: 14, fontWeight: '800' },
+  statusCard: { backgroundColor: '#dce9dc', padding: 20, marginBottom: 28 },
+  statusTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardKicker: { color: '#66766b', fontSize: 10, fontWeight: '800', letterSpacing: 1.5 },
+  statusBadge: { color: '#3e7553', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  statusTitle: { color: '#1b2b25', fontSize: 24, fontWeight: '800', marginTop: 17 },
+  statusDetail: { color: '#5b6c61', fontSize: 14, lineHeight: 21, marginTop: 7 },
+  moodRow: { flexDirection: 'row', gap: 8, marginTop: 18 },
+  moodButton: { borderWidth: 1, borderColor: '#a7bda9', paddingHorizontal: 13, paddingVertical: 9 },
+  moodSelected: { backgroundColor: '#f5f3ec', borderColor: '#f5f3ec' },
+  moodText: { color: '#466251', fontSize: 12, fontWeight: '700' },
+  sectionHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 },
+  sectionTitle: { color: '#1b2b25', fontSize: 19, fontWeight: '800' },
+  sectionMeta: { color: '#879189', fontSize: 11 },
+  scanCard: { backgroundColor: '#ffffff', padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 28, borderWidth: 1, borderColor: '#e4e2da' },
+  scanIcon: { width: 48, height: 48, backgroundColor: '#e7f0df', alignItems: 'center', justifyContent: 'center', marginRight: 13 },
+  scanIconText: { color: '#4d7958', fontSize: 29 },
+  scanCopy: { flex: 1 },
+  scanTitle: { color: '#1b2b25', fontSize: 15, fontWeight: '800' },
+  scanDetail: { color: '#78847d', fontSize: 12, lineHeight: 17, marginTop: 4 },
+  chevron: { color: '#4d7958', fontSize: 17, marginLeft: 9 },
+  habitGrid: { flexDirection: 'row', gap: 8, marginBottom: 28 },
+  habitCard: { backgroundColor: '#ffffff', flex: 1, minHeight: 118, padding: 12, borderWidth: 1, borderColor: '#e4e2da' },
+  habitIcon: { color: '#75917c', fontSize: 21, marginBottom: 12 },
+  habitLabel: { color: '#30453a', fontSize: 12, fontWeight: '800' },
+  habitValue: { color: '#8c9790', fontSize: 10, lineHeight: 14, marginTop: 5 },
+  noteCard: { backgroundColor: '#2f5542', padding: 20 },
+  noteTitle: { color: '#f5f3ec', fontSize: 20, lineHeight: 26, fontWeight: '800', marginTop: 12 },
+  noteDetail: { color: '#c7d6c8', fontSize: 13, lineHeight: 20, marginTop: 7, marginBottom: 18 },
+  linkText: { color: '#d8eea8', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  pageIntro: { color: '#6c7971', fontSize: 15, lineHeight: 22, marginTop: 12, marginBottom: 26 },
+  emptyCard: { backgroundColor: '#ffffff', alignItems: 'center', padding: 28, borderWidth: 1, borderColor: '#e4e2da' },
+  emptyIcon: { color: '#75917c', fontSize: 32 },
+  emptyTitle: { color: '#1b2b25', fontSize: 20, fontWeight: '800', marginTop: 8 },
+  emptyDetail: { color: '#78847d', fontSize: 14, marginTop: 6 },
+  primaryButton: { backgroundColor: '#395f4b', paddingHorizontal: 18, paddingVertical: 14, marginTop: 20 },
+  primaryButtonText: { color: '#f5f3ec', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  profileCard: { backgroundColor: '#ffffff', padding: 20, borderWidth: 1, borderColor: '#e4e2da', marginBottom: 12 },
+  profileStatus: { color: '#1b2b25', fontSize: 19, fontWeight: '800', marginTop: 12 },
+  profileDetail: { color: '#78847d', fontSize: 13, lineHeight: 20, marginTop: 8, marginBottom: 18 },
+  tabBar: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#deddd5', backgroundColor: '#fbfaf5', paddingBottom: 8, paddingTop: 10 },
+  tab: { flex: 1, alignItems: 'center', gap: 3 },
+  tabIcon: { color: '#9da59f', fontSize: 19 },
+  tabLabel: { color: '#8a938c', fontSize: 10, fontWeight: '700' },
+  tabActive: { color: '#356249' },
 });
